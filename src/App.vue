@@ -5,15 +5,11 @@
 
 <script>;
 export default {
+    name: 'App'
 }
 </script>
 
 <template lang="pug">
-.page
+div
+    router-view
 </template>
-
-<style scoped lang="scss">
-.page {
-    height: 100%;
-}
-</style>
