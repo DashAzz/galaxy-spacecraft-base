@@ -1,61 +1,32 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-
-const NODE_ENV = process.env.NODE_ENV;
-
-const isLocalBuild = () => (NODE_ENV === 'development');
-const setPath = (folderName) => path.join(__dirname, folderName);
 
 module.exports = {
-    output: {
-        path: setPath('dist'),
-        publicPath: '/',
-        filename: isLocalBuild() ? 'js/[name].js' : 'js/[name].[hash].js'
-    },
+    entry: [ 'babel-polyfill', path.resolve(__dirname, 'src/index.js') ],
 
-    optimization:{
-        runtimeChunk: false,
-        splitChunks: {
-            chunks: 'all',
+    devServer: {
+        port: 8000,
+        https: true,
+        proxy: {
+            '/api': {
+                target: 'https://swapi.co',
+                pathRewrite: { '^/api': '' },
+                changeOrigin: true,
+                secure: false
+            }
         }
     },
 
     resolve: {
-        extensions: ['*', '.js', '.vue'],
-        modules: [path.resolve(__dirname, 'src'), 'node_modules']
-    },
-
-    mode: isLocalBuild() ? 'development' : 'production',
-
-    devServer: {
-        historyApiFallback: true,
-        noInfo: false
+        extensions: [ '*', '.js', '.vue' ],
+        modules: [ path.resolve(__dirname, 'src'), 'node_modules' ]
     },
 
     plugins: [
-        new MiniCssExtractPlugin({
-            filename: 'css/styles.[hash].css',
-            chunkFilename: '[id].css'
-        }),
-
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': '"'+NODE_ENV+'"'
-        }),
-
         new HtmlWebpackPlugin({
             filename: 'index.html',
             inject: true,
-            template: setPath('/src/index.ejs'),
-            minify: {
-                removeAttributeQuotes: true,
-                collapseWhitespace: true,
-                html5: true,
-                minifyCSS: true,
-                removeComments: true,
-                removeEmptyAttributes: true
-            }
+            template: path.resolve(__dirname, 'src/index.ejs')
         })
     ],
 
@@ -65,16 +36,10 @@ module.exports = {
                 test: /\.vue$/,
                 loader: 'vue-loader',
                 options: {
-                    loaders: {
-                        js: 'babel-loader'
-                    }
+                    loaders: { js: 'babel-loader' }
                 }
             },
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader'
-            },
+
             {
                 test: /\.pug$/,
                 loaders: [
@@ -85,16 +50,11 @@ module.exports = {
                     }
                 ]
             },
-            {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader']
-            },
+
             {
                 test: /\.scss$/,
-                use: !isLocalBuild() ?
-                    [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'] :
-                    ['style-loader', 'css-loader', 'sass-loader']
+                use: ['css-loader', 'sass-loader']
             }
         ]
-    },
+    }
 };

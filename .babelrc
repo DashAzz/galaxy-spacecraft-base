@@ -1,0 +1,16 @@
+{
+    "presets": [
+        [
+            "env",
+            { "modules": false }
+        ]
+    ],
+
+    "plugins": [
+        "transform-regenerator",
+        [
+            "transform-object-rest-spread",
+            { "useBuiltIns": true }
+        ]
+    ]
+}

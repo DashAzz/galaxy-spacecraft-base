@@ -1,15 +1,14 @@
-<docs>
-# Page
-Контейнер для вывода лайаута
-</docs>
+<script>
+import { mapState } from 'vuex';
 
-<script>;
 export default {
-    name: 'App'
+    name: 'App',
+
+    computed: mapState([ 'title' ])
 }
 </script>
 
 <template lang="pug">
-div
-    router-view
+.container
+    router-view(v-title="title")
 </template>
